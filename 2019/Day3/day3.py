@@ -10,7 +10,7 @@ def get_path(commands):
     (x, y) = (0, 0)
     dict = {}
     position = 0
-    for command in commands.strip().split(','):
+    for command in commands.split(','):
         direction, move = command[:1], int(command[1:])
         for _ in range(move):
             position += 1
@@ -20,8 +20,7 @@ def get_path(commands):
     return dict
 
 
-first_path = get_path(input[0])
-second_path = get_path(input[1])
+first_path, second_path = map(get_path, input)
 
 intersections = set(first_path).intersection(second_path)
 
