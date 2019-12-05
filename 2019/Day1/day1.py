@@ -1,5 +1,6 @@
+import functools
 
-inputs = open("input.txt", "r")
+inputs = list(map(int, open("input.txt", "r").readlines()))
 
 
 def calculate(input):
@@ -8,8 +9,7 @@ def calculate(input):
         return 0
     return calculate(required_fuel) + required_fuel
 
-total = 0
-for input in inputs.readlines():
-    total += calculate(int(input))
 
-print(int(total))
+total = functools.reduce(lambda a, b: a+b, list(map(calculate, inputs)))
+
+print(total)

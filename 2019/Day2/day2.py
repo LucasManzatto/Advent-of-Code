@@ -5,15 +5,15 @@ input = open("input.txt", "r")
 
 def calculate(array):
     operations = array[::4]
-    for index, op in enumerate(operations):
-        index *= 4
-        if op == 99:
-            break
-        first_arg = array[array[index+1]]
-        second_arg = array[array[index+2]]
-        save_pos = array[index+3]
+    position = 0
+    while (array[position] != 99):
+        op = array[position]
+        first_arg = array[array[position+1]]
+        second_arg = array[array[position+2]]
+        save_pos = array[position+3]
         value = first_arg + second_arg if op == 1 else first_arg * second_arg
         array[save_pos] = value
+        position += 4
     return array[0]
 
 
