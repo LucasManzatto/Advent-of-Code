@@ -1,51 +1,30 @@
 import re
-input=open('input.txt').read().splitlines()
+input = open('input.txt').read().splitlines()
 
-def find_orbit(obj,input):
-    for objects in input:
-        if(objects.count(f"{obj})")) == 1:
-            second = objects.split(')')[1]
-            return f"---{second}" + find_orbit(second,input[1:])
-    return ""
-
-letters = []
-paths = []
-for objects in input:
-    first_object, second_object = objects.split(')')
-    letters.append(second_object)
-    orbit = f"{first_object}---{second_object}"
-    orbit += find_orbit(second_object,input)
-    if len([string for string in paths if orbit in string]) == 0:
-        paths.append(orbit)
-
-print(paths)
-
-main_path = paths[0].split('---')
-all_paths = [main_path]
-for path in paths[1:]:
-    path_array = path.split('---')
-    for index,item in enumerate(main_path):
-        if path_array[0] == item:
-            all_paths.append([str(index+1)] + path_array[1:])
-
-checksum = 0
-
-for path in all_paths:
-    try:
-        base = int(path[0])
-        path = path[1:]
-        # print(f"{base},{checksum},{path}")
-    except:
-        base = 0
-    for index,item in enumerate(path):
-        # print(f"{item}:{base+ index}")
-        checksum += (base + index)
-
-# print(all_paths)
-print(checksum)
+orbits = {}
+for line in input:
+    first_object, second_object = line.split(')')
+    orbits[second_object] = first_object
 
 
+def get_path(path_end,orbits,path_beginning='COM'):
+    path = []
+    while orbits.get(path_end) != path_beginning:
+            path_end = orbits.get(path_end)
+            path.append(path_end)
+    return path
 
+san_path_to_com = get_path('SAN',orbits)
+my_path_to_com = get_path('YOU',orbits)
 
+first_intersection = [value for value in my_path_to_com if value in san_path_to_com][0] 
+num_of_moves = san_path_to_com.index(first_intersection) + my_path_to_com.index(first_intersection)
 
+total = 0
+for obj in orbits.keys():
+    path_end = obj
+    while path_end != "COM":
+        path_end = orbits.get(path_end)
+        total += 1
 
+print(total,num_of_moves)
