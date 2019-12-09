@@ -111,16 +111,3 @@ root.PrintTree()
 total_count =0
 for letter in letters:
     total_count += root.get_distance(root,letter)
-print(total_count)
-# def count(node):
-#     count =0
-#     if node.left:
-#         count += node.left.count_paths()
-#     if node.right:
-#         count += node.right.count_paths()
-#     return count
-
-# while not node.is_leaf():
-#     total_count += count(node)
-#     node = node.left
-# print(total_count)
