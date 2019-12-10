@@ -53,7 +53,6 @@ def get_by_relative_address(memory, position, relative_base):
 
 
 def get_first_argument(parameter_mode, memory, position, relative_base=0):
-    parameter_mode = int(parameter_mode)
     assert parameter_mode in [POSITION_MODE, VALUE_MODE,
                               RELATIVE_MODE], f"Invalid parameter mode {parameter_mode}"
     argument = -1
@@ -67,7 +66,6 @@ def get_first_argument(parameter_mode, memory, position, relative_base=0):
 
 
 def get_second_argument(parameter_mode, memory, position, relative_base=0):
-    parameter_mode = int(parameter_mode)
     argument = -1
     assert parameter_mode in [POSITION_MODE, VALUE_MODE,
                               RELATIVE_MODE], f"Invalid parameter mode {parameter_mode}"
@@ -80,7 +78,7 @@ def get_second_argument(parameter_mode, memory, position, relative_base=0):
     return argument
 
 
-def get_save_pos(parameter_mode, memory, position, relative_base=0):
+def get_save_address(parameter_mode, memory, position, relative_base=0):
     parameter_mode = int(parameter_mode)
     assert position <= len(memory), ""
     assert parameter_mode in [
@@ -124,14 +122,14 @@ def program(memory, input=0, phase_input=0, debug=False, phase=False):
                                        position + 1, relative_base)
         second_arg = get_second_argument(second_parameter_mode,
                                          memory, position + 2, relative_base)
-        save_pos = get_save_pos(
+        address = get_save_address(
             third_parameter_mode, memory, position + 3, relative_base)
         if op in [1, 2]:
             value = first_arg + second_arg if op == 1 else first_arg * second_arg
-            memory[save_pos] = value
+            memory[address] = value
             position += 4
         elif op == 3:
-            memory[save_pos] = phase_input if phase else input
+            memory[address] = phase_input if phase else input
             phase = False
             position += 2
         elif op == 4:
@@ -142,7 +140,7 @@ def program(memory, input=0, phase_input=0, debug=False, phase=False):
             position = second_arg if (first_arg != 0 and op == 5) or (
                 first_arg == 0 and op == 6) else position + 3
         elif op in [7, 8]:
-            memory[save_pos] = int(first_arg < second_arg) if op == 7 else int(
+            memory[address] = int(first_arg < second_arg) if op == 7 else int(
                 first_arg == second_arg)
             position += 4
         elif op == 9:
