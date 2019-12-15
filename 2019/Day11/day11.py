@@ -27,10 +27,10 @@ turn_right = {
 }
 
 move = {
-    Direction.UP: (1, 0),
-    Direction.RIGHT: (0, 1),
-    Direction.DOWN: (-1, 0),
-    Direction.LEFT: (0, -1)
+    Direction.UP: (0, 1),
+    Direction.RIGHT: (1,0),
+    Direction.DOWN: (0, -1),
+    Direction.LEFT: (-1, 0)
 }
 
 
@@ -57,31 +57,34 @@ directions = {Direction.UP: "^", Direction.RIGHT: ">",
               Direction.LEFT: "<", Direction.DOWN: "V"}
 
 
-memory = list(map(int, open('input.txt').readline().split(',')))
-
+set_memory = {k:v for k,v in enumerate(list(map(int, open('input.txt').readline().split(','))))}
 painted = {(0, 0): 0}
 x = 0
 y = 0
 robot_direction = Direction.UP
-current_color = 1
-run = program(memory, current_color)
+current_color = 0
+run = program(set_memory)
 stop = False
 pause = False
-output = []
 
 while 1:
-    (output, pause, stop) = run(current_color, output, pause)
+    color,_,op = run(current_color,pause)
+    turn_direction,stop,_ = run(current_color,pause)
+    str_turn = "Left" if turn_direction == 0 else "Right"
+    curr_str_color = "White" if current_color == 1 else "Black"
+    new_str_color = "White" if color == 1 else "Black"
+    # print(f"Turn:{str_turn}")
+    # print(f"Paint color:{new_str_color}")
+    # print(f"Old Position:{x,y}, Robot Direction:{robot_direction},Color:{curr_str_color}")
     if stop:
         break
-    if pause:
-        color, turn_direction = output
-        pause = False
-        output = []
-        painted[(x, y)] = color
-        robot_direction = turn_left[robot_direction] if turn_direction == 0 else turn_right[robot_direction]
-        x,y = move_robot(robot_direction,x,y)
-        print(x,y)
-        current_color = painted.get((x, y), 0)
 
+    painted[(x, y)] = color
+    robot_direction = turn_left[robot_direction] if turn_direction == 0 else turn_right[robot_direction]
+    x,y = move_robot(robot_direction,x,y)
+    current_color = painted.get((x, y), 0)
+    # str_color = "White" if current_color == 1 else "Black"
+    # print(f"Old Position:{x,y}, Robot Direction:{robot_direction},Color:{str_color}\n")
+
+print(painted)
 print(len(painted))
-pause
