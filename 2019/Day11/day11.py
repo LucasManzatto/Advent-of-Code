@@ -62,29 +62,33 @@ painted = {(0, 0): 0}
 x = 0
 y = 0
 robot_direction = Direction.UP
-current_color = 0
+current_color = 1
 run = program(set_memory)
 stop = False
 pause = False
+output = []
 
-while 1:
-    color,_,op = run(current_color,pause)
-    turn_direction,stop,_ = run(current_color,pause)
-    str_turn = "Left" if turn_direction == 0 else "Right"
-    curr_str_color = "White" if current_color == 1 else "Black"
-    new_str_color = "White" if color == 1 else "Black"
+while not stop:
+    while not pause:
+        output,stop,pause = run(current_color,output)
+    if stop:
+        break
+    color,turn_direction = output
+    # str_turn = "Left" if turn_direction == 0 else "Right"
+    # curr_str_color = "White" if current_color == 1 else "Black"
+    # new_str_color = "White" if color == 1 else "Black"
     # print(f"Turn:{str_turn}")
     # print(f"Paint color:{new_str_color}")
     # print(f"Old Position:{x,y}, Robot Direction:{robot_direction},Color:{curr_str_color}")
-    if stop:
-        break
 
     painted[(x, y)] = color
     robot_direction = turn_left[robot_direction] if turn_direction == 0 else turn_right[robot_direction]
     x,y = move_robot(robot_direction,x,y)
     current_color = painted.get((x, y), 0)
+    output = []
+    pause = False
     # str_color = "White" if current_color == 1 else "Black"
-    # print(f"Old Position:{x,y}, Robot Direction:{robot_direction},Color:{str_color}\n")
+    # print(f"New Position:{x,y}, Robot Direction:{robot_direction},Color:{str_color}\n")
 
-print(painted)
+# print(painted)
 print(len(painted))

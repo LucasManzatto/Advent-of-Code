@@ -44,8 +44,6 @@ def get_argument(parameter_mode, memory, position, relative_base=0,get_by_addres
         argument = get_by_value(memory, position)
     elif parameter_mode == RELATIVE_MODE:
         argument = get_by_relative_address(memory, position, relative_base) if get_by_address else get_by_relative_pos(memory, position, relative_base)
-    if isinstance(argument,list):
-        argument = 0
     return argument
 
 def get_parameters(instruction):
@@ -74,31 +72,27 @@ def program(memory, program_input=0, debug=False):
     relative_base = 0
     position = 0
     stop = False
-    output = 0
-    def run(program_input,pause):
+    def run(program_input,output):
         nonlocal position
         nonlocal relative_base
         nonlocal memory
         nonlocal stop
-        nonlocal output
+        pause = False
         op, first_arg, second_arg, address = decode_instruction(
             memory, position, relative_base)
         if op == 1:
             memory[address] = first_arg + second_arg
-            if memory[address] == []:
-                print(first_arg +second_arg)
             position += 4
         if op == 2:
             memory[address] = first_arg * second_arg
-            if memory[address] == []:
-                print(first_arg *second_arg)
-            position += 4
+            position += 4   
         elif op == 3:
             memory[address] = program_input
             position += 2
         elif op == 4:
-            output = first_arg
-            pause = True
+            output.append(first_arg)
+            if len(output) == 2:
+                pause = True
             position += 2
         elif op == 5:
             position = second_arg if first_arg != 0 else position + 3
@@ -114,9 +108,8 @@ def program(memory, program_input=0, debug=False):
             relative_base += first_arg
             position += 2
         elif op == 99:
+            pause = True
             stop = True
-        # if memory.get(address,0) == []:
-        #     print(address)
         return output, stop, pause
     return run
 
