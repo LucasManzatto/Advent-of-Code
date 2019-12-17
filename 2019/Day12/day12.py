@@ -5,30 +5,29 @@ import functools
 
 class Moon:
     def __init__(self, x, y, z):
-        self.pos_x = x
-        self.pos_y = y
-        self.pos_z = z
-        self.vel_x = 0
-        self.vel_y = 0
-        self.vel_z = 0
+        self.position = {'x': x, 'y': y, 'z': z}
+        self.velocity = {'x': 0, 'y': 0, 'z': 0}
+        self.axis = ['x','y','z']
 
     def change(self, x, y, z):
-        self.vel_x += x
-        self.vel_y += y
-        self.vel_z += z
+        self.velocity['x'] += x
+        self.velocity['y'] += y
+        self.velocity['z'] += z
 
     def change_pos(self):
-        self.pos_x += self.vel_x
-        self.pos_y += self.vel_y
-        self.pos_z += self.vel_z
+        for axis in self.axis:
+            self.position[axis] += self.velocity[axis]
+        
 
     def get_energy(self):
-        potential_energy = abs(self.pos_x) + abs(self.pos_y) + abs(self.pos_z)
-        kinetic_energy = abs(self.vel_x) + abs(self.vel_y) + abs(self.vel_z)
+        potential_energy = functools.reduce(
+            lambda a, b: a + abs(b), self.position.values(), 0)
+        kinetic_energy = functools.reduce(
+            lambda a, b: a + abs(b), self.velocity.values(), 0)
         return potential_energy * kinetic_energy
 
     def __str__(self):
-        return f"Pos:{self.pos_x,self.pos_y,self.pos_z}, Vel:{self.vel_x,self.vel_y,self.vel_z}"
+        return f"Pos:{self.position}, Vel:{self.velocity}"
 
 
 first = Moon(4, 12, 13)
@@ -40,21 +39,11 @@ moons = [first, second, third, forth]
 original_moons = copy.deepcopy(moons)
 
 
-def is_equal(first, second):
-    return first.pos_x == second.pos_x and first.pos_y == second.pos_y and first.pos_z == second.pos_z \
-        and first.vel_x == second.vel_x and first.vel_y == second.vel_y and first.vel_z == second.vel_z
-
-
-def check_x_axis(original_moons, moons):
-    return original_moons[0].pos_x == moons[0].pos_x and original_moons[1].pos_x == moons[1].pos_x and original_moons[2].pos_x == moons[2].pos_x and original_moons[3].pos_x == moons[3].pos_x
-
-
-def check_y_axis(original_moons, moons):
-    return original_moons[0].pos_y == moons[0].pos_y and original_moons[1].pos_y == moons[1].pos_y and original_moons[2].pos_y == moons[2].pos_y and original_moons[3].pos_y == moons[3].pos_y
-
-
-def check_z_axis(original_moons, moons):
-    return original_moons[0].pos_z == moons[0].pos_z and original_moons[1].pos_z == moons[1].pos_z and original_moons[2].pos_z == moons[2].pos_z and original_moons[3].pos_z == moons[3].pos_z
+def check_axis(original_moons, moons, axis):
+    is_equal = True
+    for i, moon in enumerate(original_moons):
+        is_equal = is_equal and moon.position[axis] == moons[i].position[axis]
+    return is_equal
 
 
 def get_value(first, second):
@@ -71,22 +60,21 @@ def lcm(x, y):
 
 
 def calculate_lcm(numbers):
-    return functools.reduce(lcm,numbers,1)
+    return functools.reduce(lcm, numbers, 1)
 
 
 def check(first, second):
-    x = get_value(first.pos_x, second.pos_x)
-    y = get_value(first.pos_y, second.pos_y)
-    z = get_value(first.pos_z, second.pos_z)
-
+    [x, y, z] = [get_value(first.position[axis], second.position[axis])
+                 for axis in ['x', 'y', 'z']]
     first.change(x, y, z)
     second.change(-x, -y, -z)
     return first, second
 
+
 def part1(moons):
     c_moons = copy.deepcopy(moons)
-    first,second,third,forth = c_moons
-    total =0
+    first, second, third, forth = c_moons
+    total = 0
     for _ in range(1000):
         first, second = check(first, second)
         first, third = check(first, third)
@@ -102,7 +90,7 @@ def part1(moons):
 
 
 def part2(moons):
-    first,second,third,forth = moons
+    first, second, third, forth = moons
     x = y = z = None
     i = 1
     while 1:
@@ -115,18 +103,19 @@ def part2(moons):
         third, forth = check(third, forth)
         for moon in moons:
             moon.change_pos()
-        if check_x_axis(original_moons, moons) and not x:
+        if check_axis(original_moons, moons, 'x') and not x:
             x = i
-        if check_y_axis(original_moons, moons) and not y:
+        if check_axis(original_moons, moons, 'y') and not y:
             y = i
-        if check_z_axis(original_moons, moons) and not z:
+        if check_axis(original_moons, moons, 'z') and not z:
             z = i
         if x and y and z:
             break
-    return calculate_lcm([x,y,z])
+    return calculate_lcm([x, y, z])
+
 
 total = part1(moons)
 lcm = part2(moons)
 
 
-print(lcm,total)
+print(lcm, total)
