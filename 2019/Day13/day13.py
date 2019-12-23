@@ -1,7 +1,11 @@
-import intcode
 import functools
 import itertools
 import random
+import os
+import sys
+sys.path.insert(0,'..')
+import intcode
+
 
 tiles = {
     0: ' ',
@@ -13,42 +17,50 @@ tiles = {
 
 run = intcode.program('input.txt')
 
+def print_game(board):
+    width = max([k[0] for k in board]) + 1
+    height = max([k[1] for k in board]) + 1
+    print_board = {(elem[0],elem[1]):elem[2] for elem in board}
+    for col in range(height):
+        line = ""
+        for row in range(width):
+            line += tiles[print_board.get((row,col),0)]
+        print(line)
+    os.system('cls')
 
-def chunks(array, n):
-    for i in range(0, len(array), n):
-        yield array[i:i + n]
-
-
-stop = pause = False
+stop = False
+pause = False
 output = []
 full_output = []
 direction = 0
-rand = [0,1,-1]
+score = 0
+ball = None
+paddle = None
+
 while not stop:
     while not pause:
-        output, stop, pause = run(output,random.choice(rand))
+        output, stop, pause = run(output, direction)
     if stop:
         break
+    # x,y == (-1,0) is the score
+    if output[0:2] == [-1, 0]:
+        score = output[2]
+    elif output[2] == 4:
+        ball = output[0:2]
+    if output[2] == 3:
+        paddle = output[0:2]
+
     full_output.append(output)
     pause = False
     output = []
+    if ball and paddle:
+        direction = 0
+        if paddle[0] < ball[0]:
+            direction = 1
+        elif paddle[0] > ball[0]:
+            direction = -1
 
-# intcode.test()
-# part 1
-blocks = functools.reduce(lambda a, b: a + int(b[2] == 2), full_output, 0)
-scores = list(filter(lambda x: x[0] == -1 and x[1] == 0, full_output))
-balls = list(filter(lambda x: x[2] == 4, full_output))
-paddles = list(filter(lambda x: x[2] == 3, full_output))
-
-
-lines = list(chunks(full_output,38))
-for line in lines:
-    str_line=""
-    for elem in line:
-        str_line += tiles[elem[2]]
-    print(str_line)
-# print(lines[0])
-print(full_output)
-print(blocks)
-# print(scores)
-print(paddles)
+print(score)
+def part1():
+    blocks = functools.reduce(lambda a, b: a + int(b[2] == 2), full_output, 0)
+    print(blocks)
