@@ -1,3 +1,4 @@
+import re
 inputs = [s.strip().split('->')
           for s in open('input.txt').read().splitlines()]
 
@@ -6,12 +7,17 @@ for signal, output_wire in inputs:
     circuit[output_wire.strip()] = signal.strip()
 
 output_wire = 'c'
-for _ in range(100):
+# print(circuit)
+print(dict(sorted(circuit.items())))
+for _ in range(1):
     signal = circuit.get(output_wire)
     signal = str(signal)
+    # test = list(filter(lambda a: re.findall(rf'\s{output_wire}',a,re.IGNORECASE),circuit.values()))
+    # print(test)
     if 'AND' in signal:
         wires = signal.split('AND')
         signal_value = circuit.get(wires[0]) & circuit.get(wires[1])
+        print(signal_value)
     elif 'OR' in signal:
         wires = signal.split('OR')
         signal_value = circuit.get(wires[0]) | circuit.get(wires[1])
@@ -30,4 +36,4 @@ for _ in range(100):
     if isinstance(circuit.get('a'),int):
         break  
 
-print(circuit)
+# print(circuit)
